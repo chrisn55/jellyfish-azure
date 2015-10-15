@@ -2,6 +2,7 @@
 
 DNSNAME=$1
 IPADDRESS=$2
+USERNAME=$3
 
 bash add_host_entry.sh $DNSNAME $IPADDRESS
 
@@ -16,9 +17,9 @@ curl -sL https://deb.nodesource.com/setup | bash -
 apt-get install -y nodejs
 
 # run the install ruby script
-cp install_ruby.sh /home/jellyfish/
-cd /home/jellyfish
+cp install_ruby.sh /home/$USERNAME/
+cd /home/$USERNAME
 chmod +r install_ruby.sh
-sudo -u jellyfish bash install_ruby.sh
-rm /home/jellyfish/install_ruby.sh
+sudo -u $USERNAME bash install_ruby.sh
+rm /home/$USERNAME/install_ruby.sh
 

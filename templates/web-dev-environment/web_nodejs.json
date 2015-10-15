@@ -34,10 +34,9 @@
     },
     "scripts": [
       "[concat(parameters('templateBaseUrl'), 'shared/add_host_entry.sh')]",
-      "[concat(parameters('templateBaseUrl'), 'web_ruby/install_dependencies.sh')]",
-      "[concat(parameters('templateBaseUrl'), 'web_ruby/install_ruby.sh')]"
+      "[concat(parameters('templateBaseUrl'), 'web_nodejs/install_nodejs.sh')]"
     ],
-    "scriptCommand": "[concat('bash install_dependencies.sh dbserver ', parameters('dbIpAddress'), ' ', parameters('adminUsername'))]"
+    "scriptCommand": "[concat('bash install_nodejs.sh dbserver ', parameters('dbIpAddress'))]"
   },
   "resources": [
     {
@@ -77,7 +76,7 @@
     },
     {
       "type": "Microsoft.Compute/virtualMachines/extensions",
-      "name": "[concat(parameters('serverSettings').name, '/install_ruby')]",
+      "name": "[concat(parameters('serverSettings').name, '/install_nodejs')]",
       "apiVersion": "2015-05-01-preview",
       "location": "[resourceGroup().location]",
       "dependsOn": [

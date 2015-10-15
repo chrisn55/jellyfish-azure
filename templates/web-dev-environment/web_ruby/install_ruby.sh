@@ -6,7 +6,6 @@ source ~/.rvm/scripts/rvm
 rvm install 2.2.3
 
 # choose versioni
-echo "Choose version"
 rvm use 2.2.3 --default
 
 echo 'export PATH="$HOME/.rvm/scripts:$PATH"' >> ~/.bashrc

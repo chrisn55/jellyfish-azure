@@ -17,7 +17,7 @@
     "webTechnology": {
       "type": "string",
       "allowedValues": [
-        "aspnet",
+        "nodejs",
         "ruby"
       ],
       "metadata": {
