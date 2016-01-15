@@ -21,6 +21,13 @@ module JellyfishAzure
         promise.value!
       end
 
+      def get_resource_group_status(resource_group_name)
+        promise = @client.resource_groups.get resource_group_name
+        result = promise.value!
+
+        [result.body.properties.provisioning_state, result.body.properties.outputs || {}]
+      end
+
       def get_deployment_status(resource_group_name, deployment_name)
         promise = @client.deployments.get resource_group_name, deployment_name
         result = promise.value!

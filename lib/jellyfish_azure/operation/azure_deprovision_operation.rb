@@ -1,8 +1,6 @@
-
 module JellyfishAzure
   module Operation
-    class AzureProvisionOperation
-      DEPLOYMENT_NAME = 'Deployment'
+    class AzureDeprovisionOperation
       WAIT_TIMEOUT = 14_400
       WAIT_DELAY = 15
 
@@ -24,29 +22,19 @@ module JellyfishAzure
       def location
       end
 
-      def template_url
-      end
-
-      def template_parameters
-      end
-
       def execute
         setup
 
-        @cloud_client.resource_group.create_resource_group @service.resource_group_name, location
+        promise = @cloud_client.resource_group.remove_resource_group  @service.resource_group_name
 
-        @cloud_client.deployment.create_deployment @service.resource_group_name, DEPLOYMENT_NAME, template_url, template_parameters
+        set_status :deprovisioning, 'Deprovisioning service'
 
-        set_status :provisioning, 'Provisioning service'
+        wait_for_status @service.resource_group_name
 
-        outputs = wait_for_deployment DEPLOYMENT_NAME
-
-        outputs.each { |key, value| @service.service_outputs.create(name: key, value: value[:value], value_type: :string) }
-
-        set_status :available, 'Deployment successful'
+        set_status :deprovisioned, 'Deprovision successful'
 
       rescue WaitUtil::TimeoutError
-        handle_error 'The provisioning operation timed out.'
+        handle_error 'The deprovisioning operation timed out.'
       rescue ValidationError => e
         handle_error e.to_s
       rescue AzureDeploymentErrors => e
@@ -74,18 +62,17 @@ module JellyfishAzure
         @service.save
       end
 
-      def wait_for_deployment(deployment_name)
+      def wait_for_status(resource_group_name)
         state = nil
         outputs = nil
-        WaitUtil.wait_for_condition 'deployment', timeout_sec: deploy_timeout, delay_sec: deploy_delay do
-          state, outputs = @cloud_client.deployment.get_deployment_status @service.resource_group_name, deployment_name
+        WaitUtil.wait_for_condition 'deprovision', timeout_sec: deploy_timeout, delay_sec: deploy_delay do
+          rg= @cloud_client.resource_groups.get resource_group_name
 
-          (state != 'Accepted' && state != 'Running')
+          (rg.properties.provisioningState != 'Failed' && rg.properties.provisioningState != 'Deleted')
         end
 
-        if (state == 'Failed')
-          errors = @cloud_client.deployment.get_deployment_errors @service.resource_group_name, deployment_name
-
+        if (rg.properties.provisioningState == 'Failed')
+          errors = AzureDeploymentError.new 'Unable to completely remove all resources in group'
           fail AzureDeploymentErrors, errors
         end
 

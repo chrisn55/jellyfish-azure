@@ -15,5 +15,8 @@ coverage
 # Ignore dotenv file
 .env
 
+# Ignore built file
+jellyfish-azure-*.gem
+
 # Ignore Gemfile lock
 Gemfile.lock
