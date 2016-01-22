@@ -37,10 +37,14 @@ module JellyfishAzure
         end
       end
 
+      #
+      #  we receive a data structure with the following format:
+      #  key: { value: "", type: "" }
+      #
       def save_outputs(outputs)
         outputs.each do |key, value|
           service_output = get_output(key) || @service.service_outputs.new(name: key)
-          service_output.update_attributes(value: value[:value], value_type: :string) unless service_output.nil?
+          service_output.update_attributes(value: value['value'], value_type: :string) unless service_output.nil?
         end
       end
 
