@@ -6,6 +6,11 @@ module JellyfishAzure
         @client.subscription_id = subscription_id
       end
 
+      def get(resource_group_name)
+        promise = @client.resource_groups.get(resource_group_name)
+        promise.value!
+      end
+
       def create_resource_group(resource_group_name, location)
         resource_group = ::Azure::ARM::Resources::Models::ResourceGroup.new
         resource_group.location = location

@@ -11,6 +11,12 @@ module JellyfishAzure
       end
 
       def deprovision
+        @status = ::Service.defined_enums['status']['stopping']
+        @status_msg = 'Deprovisioning started'
+        delay.deprovision_worker
+      end
+
+      def deprovision_worker
         credentials = product.provider.credentials
         @cloud_client = JellyfishAzure::Cloud::AzureClient.new credentials, product.provider.subscription_id
 

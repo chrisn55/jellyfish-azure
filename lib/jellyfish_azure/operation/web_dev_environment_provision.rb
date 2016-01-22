@@ -23,7 +23,7 @@ module JellyfishAzure
 
       def template_parameters
         {
-          serviceName: { value: resource_group_name },
+          serviceName: { value: @service.resource_group_name },
           webTechnology: { value: @product.settings[:az_dev_web] },
           dbTechnology: { value: @product.settings[:az_dev_db] },
           dnsNameForPublicIP: { value: @service.settings[:az_dev_dns] },

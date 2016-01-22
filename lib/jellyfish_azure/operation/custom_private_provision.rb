@@ -30,7 +30,7 @@ module JellyfishAzure
         base_parameters = {
           templateBaseUrl: { value: URI.join(template_url, '.').to_s },
           sasToken: { value: URI(template_url).query },
-          serviceName: { value: resource_group_name }
+          serviceName: { value: @service.resource_group_name }
         }
 
         base_parameters.merge template_parameters

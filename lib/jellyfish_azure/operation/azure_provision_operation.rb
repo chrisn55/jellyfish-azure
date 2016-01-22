@@ -41,37 +41,55 @@ module JellyfishAzure
 
         outputs = wait_for_deployment DEPLOYMENT_NAME
 
-        outputs.each { |key, value| @service.service_outputs.create(name: key, value: value[:value], value_type: :string) }
+        save_outputs outputs
 
         set_status :available, 'Deployment successful'
 
       rescue WaitUtil::TimeoutError
-        handle_error 'The provisioning operation timed out.'
+        handle_error ['The provisioning operation timed out.']
       rescue ValidationError => e
-        handle_error e.to_s
+        handle_error [e.to_s]
       rescue AzureDeploymentErrors => e
-        handle_error e.errors.map(&:error_message).join "\n"
+        handle_error e.errors
       rescue MsRestAzure::AzureOperationError => e
         handle_azure_error e
       rescue => e
-        handle_error "Unexpected error: #{e.class}: #{e.message}"
+        handle_error ["Unexpected error: #{e.class}: #{e.message}"]
       end
 
       private
 
-      def handle_error(message)
-        set_status :terminated, message
+      def handle_error(messages)
+        set_status :terminated, messages[0]
+        messages.each do |msg|
+          entry = @service.logs.new
+          entry.update_attributes(log_level: 'error', message: msg) unless entry.nil?
+        end
       end
 
       def handle_azure_error(error)
-        message = error.body.nil? ? error.message : error.body['error']['message']
-        set_status :terminated, message
+        msg = error.body.nil? ? error.message : error.body['error']['message']
+        set_status :terminated, msg
+        msg = error.body.nil? ? error.message : error.body['error']['message']
+        entry = @service.logs.new
+        entry.update_attributes(log_level: 'error', message: msg) unless entry.nil?
       end
 
       def set_status(status, message)
         @service.status = status
         @service.status_msg = message
         @service.save
+      end
+
+      def save_outputs(outputs)
+        outputs.each do |key, value|
+          service_output = get_output(key) || @service.service_outputs.new(name: key)
+          service_output.update_attributes(value: value[:value], value_type: :string) unless service_output.nil?
+        end
+      end
+
+      def get_output(name)
+        @service.service_outputs.where(name: name).first
       end
 
       def wait_for_deployment(deployment_name)

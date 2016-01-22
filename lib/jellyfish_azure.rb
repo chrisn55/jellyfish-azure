@@ -25,7 +25,7 @@ require 'jellyfish_azure/definition/web_dev_environment_definition.rb'
 
 require 'jellyfish_azure/operation/azure_deployment_errors.rb'
 require 'jellyfish_azure/operation/azure_provision_operation.rb'
-
+require 'jellyfish_azure/operation/azure_deprovision_operation.rb'
 require 'jellyfish_azure/operation/custom_private_provision.rb'
 require 'jellyfish_azure/operation/custom_public_provision.rb'
 require 'jellyfish_azure/operation/web_dev_environment_provision.rb'

@@ -1,6 +1,6 @@
 module JellyfishAzure
   module Service
-    class WebDevEnvironment < ::Service
+    class WebDevEnvironment < AzureService
       def provision
         credentials = product.provider.credentials
         @cloud_client = JellyfishAzure::Cloud::AzureClient.new credentials, product.provider.subscription_id
