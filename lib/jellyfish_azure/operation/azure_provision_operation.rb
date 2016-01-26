@@ -18,6 +18,8 @@ module JellyfishAzure
       def execute
         setup
 
+        log_note 'Provisioning started'
+
         set_status :provisioning, 'Provisioning service'
 
         @cloud_client.resource_group.create_resource_group @service.resource_group_name, location
@@ -29,6 +31,7 @@ module JellyfishAzure
         save_outputs outputs
 
         set_status :available, 'Deployment successful'
+        log_note 'Provisioning completed successfully'
 
       rescue WaitUtil::TimeoutError
         handle_errors ['The provisioning operation timed out.']
